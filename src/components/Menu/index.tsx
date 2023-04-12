@@ -4,7 +4,7 @@ import { CheckIcon, DotFilledIcon } from '@radix-ui/react-icons'
 
 import classes from './styles.module.css'
 import { BodyEditor } from '../../editor'
-import i18n from '../../i18n'
+import i18n, { IsChina } from '../../i18n'
 import { Helper } from '../../environments/online/helper'
 import { uploadImage } from '../../utils/transfer'
 import { getCurrentTime } from '../../utils/time'
@@ -13,6 +13,7 @@ import classNames from 'classnames'
 import { useLanguageSelect } from '../../hooks'
 import { ShowContextMenu } from '../ContextMenu'
 import { ShowDialog } from '../Dialog'
+import { SetCDNBase } from '../../utils/detect'
 
 const {
     MenubarRoot,
@@ -39,7 +40,7 @@ const MenubarDemo: React.FC<{
 
     useEffect(() => {
         const show = (data: { mouseX: number; mouseY: number }) => {
-            ShowContextMenu({ ...data, editor })
+            ShowContextMenu({ ...data, editor, onChangeBackground })
         }
         editor?.ContextMenuEventManager.AddEventListener(show)
         return () => {
@@ -60,6 +61,12 @@ const MenubarDemo: React.FC<{
                         sideOffset={5}
                         alignOffset={-3}
                     >
+                        <Menubar.Item
+                            className={MenubarItem}
+                            onSelect={() => editor.ResetScene()}
+                        >
+                            {i18n.t('Reset Scene')}
+                        </Menubar.Item>
                         <Menubar.Item
                             className={MenubarItem}
                             onSelect={() => editor.LoadScene()}
@@ -96,11 +103,22 @@ const MenubarDemo: React.FC<{
                         >
                             {i18n.t('Detect From Image')}
                         </Menubar.Item>
+                        {IsChina() ? (
+                            <Menubar.Item
+                                className={MenubarItem}
+                                onSelect={() => {
+                                    SetCDNBase(false)
+                                    helper.DetectFromImage(onChangeBackground)
+                                }}
+                            >
+                                {i18n.t('Detect From Image') + ' [中国]'}
+                            </Menubar.Item>
+                        ) : undefined}
                         <Menubar.Item
                             className={MenubarItem}
                             onSelect={() => helper.SetRandomPose()}
                         >
-                            {i18n.t('Set Random Pose [NEW]')}
+                            {i18n.t('Set Random Pose')}
                         </Menubar.Item>
                         <Menubar.Item
                             className={MenubarItem}

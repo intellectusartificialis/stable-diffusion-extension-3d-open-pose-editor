@@ -27,6 +27,21 @@ const config: UserConfigFn = ({ command, mode, ssrBuild }) => {
                         },
                     },
                 },
+                {
+                    urlPattern:
+                        /^https:\/\/openpose-editor.oss-cn-beijing\.aliyuncs\.com\/.*/i,
+                    handler: 'CacheFirst',
+                    options: {
+                        cacheName: 'aliyuncs',
+                        expiration: {
+                            maxEntries: 10,
+                            maxAgeSeconds: 60 * 60 * 24 * 365, // <== 365 days
+                        },
+                        cacheableResponse: {
+                            statuses: [0, 200],
+                        },
+                    },
+                },
             ],
         },
         includeAssets: [
@@ -95,7 +110,7 @@ const config: UserConfigFn = ({ command, mode, ssrBuild }) => {
         base: mode === 'singlefile' ? './' : '/open-pose-editor/',
         define: {
             global: {},
-            __APP_VERSION__: JSON.stringify('0.1.13'),
+            __APP_VERSION__: JSON.stringify('0.1.16'),
             __APP_BUILD_TIME__: Date.now(),
         },
         build: {
