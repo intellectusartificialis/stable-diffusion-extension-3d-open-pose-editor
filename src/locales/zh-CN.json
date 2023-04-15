@@ -62,5 +62,10 @@
     "Copy Keypoint Data": "复制关键点数据",
     "Copied to Clipboard": "已复制到剪贴板",
     "Generate Scene URL": "生成场景URL",
-    "Reset Scene": "重置场景"
+    "Reset Scene": "重置场景",
+    "Load Gesture": "加载手势",
+    "Save Gesture": "保存手势",
+    "Please select a hand!!": "请选择一只手！！",
+    "If you try to detect anime characters, you may get an error. Please try again with photos.": "如果您尝试检测动漫角色，可能会出现错误。请使用照片再试一次。",
+    "Show Grid": "显示网格"
 }

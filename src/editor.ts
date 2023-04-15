@@ -243,6 +243,8 @@ export class BodyEditor {
     effectSobel?: ShaderPass
     enableComposer = false
     enablePreview = true
+    enableHelper = true
+
     paused = false
 
     parentElem: ParentElement
@@ -1153,11 +1155,23 @@ export class BodyEditor {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         return () => {}
     }
+    changeHelper() {
+        const old = {
+            axesHelper: this.axesHelper.visible,
+            gridHelper: this.gridHelper.visible,
+        }
+        this.axesHelper.visible = false
+        this.gridHelper.visible = false
+
+        return () => {
+            this.axesHelper.visible = old.axesHelper
+            this.gridHelper.visible = old.gridHelper
+        }
+    }
     MakeImages() {
         this.renderer.setClearColor(0x000000)
 
-        this.axesHelper.visible = false
-        this.gridHelper.visible = false
+        const restoreHelper = this.changeHelper()
 
         const restoreTransfromControl = this.changeTransformControl()
         const restoreView = this.changeView()
@@ -1173,8 +1187,7 @@ export class BodyEditor {
         /// end
 
         this.renderer.setClearColor(0x000000, 0)
-        this.axesHelper.visible = true
-        this.gridHelper.visible = true
+        restoreHelper()
 
         restoreTransfromControl()
         restoreView()
@@ -1250,13 +1263,26 @@ export class BodyEditor {
     }
 
     getSelectedBody() {
-        let obj: Object3D | null = this.transformControl.object ?? null
+        let obj: Object3D | null = this.getSelectedPart() ?? null
         obj = obj ? this.getBodyByPart(obj) : null
 
         return obj
     }
     getSelectedPart() {
         return this.transformControl.object
+    }
+
+    getHandByPart(o: Object3D) {
+        if (IsHand(o?.name)) return o
+
+        const body = this.getAncestors(o).find((o) => IsHand(o?.name)) ?? null
+        return body
+    }
+
+    getSelectedHand() {
+        let obj: Object3D | null = this.getSelectedPart() ?? null
+        obj = obj ? this.getHandByPart(obj) : null
+        return obj
     }
     RemoveBody() {
         const obj = this.getSelectedBody()
@@ -1365,6 +1391,14 @@ export class BodyEditor {
         this.setFootVisible(!this.onlyHand)
     }
 
+    get EnableHelper() {
+        return this.enableHelper
+    }
+    set EnableHelper(value: boolean) {
+        this.enableHelper = value
+        this.gridHelper.visible = value
+        this.axesHelper.visible = value
+    }
     setFootVisible(value: boolean) {
         this.traverseExtremities((o) => {
             if (IsFoot(o.name)) {
@@ -1521,6 +1555,25 @@ void main() {
 
         return data
     }
+    GetGesture() {
+        const hand = this.getSelectedHand()
+        const body = this.getSelectedBody()
+
+        if (!hand || !body) return null
+        const data = {
+            header: 'Openpose Editor by Yu Zhu',
+            version: __APP_VERSION__,
+            object: {
+                hand: new BodyControlor(body).GetHandData(
+                    hand.name === 'left_hand' ? 'left_hand' : 'right_hand'
+                ),
+            },
+            setting: {},
+        }
+
+        return data
+    }
+
     AutoSaveScene() {
         try {
             const rawData = localStorage.getItem('AutoSaveSceneData')
@@ -1547,6 +1600,31 @@ void main() {
         } catch (error) {
             console.error(error)
         }
+    }
+    RestoreGesture(rawData: string) {
+        const data = JSON.parse(rawData)
+
+        const {
+            version,
+            object: { hand: handData },
+            setting,
+        } = data
+
+        if (!handData) throw new Error('Invalid json')
+        const hand = this.getSelectedHand()
+        const body = this.getSelectedBody()
+
+        if (!hand || !body) throw new Error('!hand || !body')
+
+        new BodyControlor(body).RestoreHand(
+            hand.name == 'left_hand' ? 'left_hand' : 'right_hand',
+            handData
+        )
+    }
+    SaveGesture() {
+        const data = this.GetGesture()
+        if (!data) throw new Error('Failed to get gesture')
+        downloadJson(JSON.stringify(data), `gesture_${getCurrentTime()}.json`)
     }
 
     ClearScene() {

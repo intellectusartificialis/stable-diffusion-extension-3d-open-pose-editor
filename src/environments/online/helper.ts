@@ -1,5 +1,9 @@
 import { getImage } from '../../utils/image'
-import { CopyTextToClipboard, uploadImage } from '../../utils/transfer'
+import {
+    CopyTextToClipboard,
+    uploadImage,
+    uploadJson,
+} from '../../utils/transfer'
 import { DetectPosefromImage } from '../../utils/detect'
 
 import { BodyControlor } from '../../body'
@@ -62,7 +66,13 @@ export class Helper {
         } catch (error) {
             loading.hide()
 
-            Oops(error)
+            Oops(
+                i18n.t(
+                    'If you try to detect anime characters, you may get an error. Please try again with photos.'
+                ) +
+                    '\n' +
+                    error
+            )
             console.error(error)
             return null
         }
@@ -78,6 +88,41 @@ export class Helper {
             const data = new BodyControlor(body).Get18keyPointsData()
             await CopyTextToClipboard(JSON.stringify(data, null, 4))
             ShowToast({ title: i18n.t('Copied to Clipboard') })
+        } catch (error) {
+            Oops(error)
+            console.error(error)
+            return null
+        }
+    }
+
+    async SaveGesture() {
+        const hand = await this.editor.getSelectedHand()
+        if (!hand) {
+            ShowToast({ title: i18n.t('Please select a hand!!') })
+            return
+        }
+        try {
+            this.editor.SaveGesture()
+        } catch (error) {
+            Oops(error)
+            console.error(error)
+            return null
+        }
+    }
+
+    async LoadGesture() {
+        const hand = await this.editor.getSelectedHand()
+
+        if (!hand) {
+            ShowToast({ title: i18n.t('Please select a hand!!') })
+            return
+        }
+
+        const rawData = await uploadJson()
+        if (!rawData) return
+
+        try {
+            this.editor.RestoreGesture(rawData)
         } catch (error) {
             Oops(error)
             console.error(error)

@@ -81,6 +81,18 @@ const MenubarDemo: React.FC<{
                         </Menubar.Item>
                         <Menubar.Item
                             className={MenubarItem}
+                            onSelect={() => helper.LoadGesture()}
+                        >
+                            {i18n.t('Load Gesture')}
+                        </Menubar.Item>
+                        <Menubar.Item
+                            className={MenubarItem}
+                            onSelect={() => helper.SaveGesture()}
+                        >
+                            {i18n.t('Save Gesture')}
+                        </Menubar.Item>
+                        <Menubar.Item
+                            className={MenubarItem}
                             onSelect={() => {
                                 helper.GenerateSceneURL()
                             }}
@@ -289,6 +301,21 @@ const MenubarDemo: React.FC<{
                                 <CheckIcon />
                             </Menubar.ItemIndicator>
                             {i18n.t('Show Preview')}
+                        </Menubar.CheckboxItem>
+                        <Menubar.CheckboxItem
+                            className={classNames(MenubarCheckboxItem, inset)}
+                            checked={editor.EnableHelper}
+                            onCheckedChange={() => {
+                                editor.EnableHelper = !editor.EnableHelper
+                                forceUpdate()
+                            }}
+                        >
+                            <Menubar.ItemIndicator
+                                className={MenubarItemIndicator}
+                            >
+                                <CheckIcon />
+                            </Menubar.ItemIndicator>
+                            {i18n.t('Show Grid')}
                         </Menubar.CheckboxItem>
                     </Menubar.Content>
                 </Menubar.Portal>

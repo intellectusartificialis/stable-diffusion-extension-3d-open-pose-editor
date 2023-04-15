@@ -62,5 +62,10 @@
     "Copy Keypoint Data": "Copiar datos del punto clave",
     "Copied to Clipboard": "Copiado al portapapeles",
     "Generate Scene URL": "Generar URL de escena",
-    "Reset Scene": "Restablecer escena"
+    "Reset Scene": "Restablecer escena",
+    "Load Gesture": "Cargar gesto",
+    "Save Gesture": "Guardar gesto",
+    "Please select a hand!!": "¡¡Por favor, seleccione una mano!!",
+    "If you try to detect anime characters, you may get an error. Please try again with photos.": "Si intenta detectar personajes de anime, es posible que obtenga un error. Por favor, inténtelo de nuevo con fotos.",
+    "Show Grid": "Mostrar cuadrícula"
 }
